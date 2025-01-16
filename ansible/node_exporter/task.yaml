@@ -1,0 +1,35 @@
+---
+- name: Setup node_exporter
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Copy blackbox_exporter binary
+      copy:
+        src: ../bin/node_exporter
+        dest: /usr/local/bin/node_exporter
+        mode: '0755'
+
+    - name: Set usystemd
+      copy:
+        dest: /etc/systemd/system/node_exporter.service
+        content: |
+          [Unit]
+          Description=Node Exporter
+          After=network.target
+
+          [Service]
+          User=root
+          ExecStart=/usr/local/bin/node_exporter
+
+          [Install]
+          WantedBy=default.target
+
+    - name: Reload systemd
+      command: systemctl daemon-reload
+
+    - name: Enable and start node_exporter service
+      systemd:
+        name: node_exporter
+        enabled: yes
+        state: started
