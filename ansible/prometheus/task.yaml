@@ -1,0 +1,99 @@
+---
+- name: Setup Prometheus
+  hosts: balancers
+  become: true
+
+  tasks:
+    - name: Copy Prometheus binary
+      copy:
+        src: ../bin/prometheus
+        dest: /usr/local/bin/prometheus
+        mode: '0755'
+    
+    - name: Copy promtool binary
+      copy:
+        src: ../bin/promtool
+        dest: /usr/local/bin/promtool
+        mode: '0755'
+    
+    - name: Copy Alertmanager binary
+      copy:
+        src: ../bin/alertmanager
+        dest: /usr/local/bin/alertmanager
+        mode: '0755'
+    
+    - name: Copy amtool binary
+      copy:
+        src: ../bin/amtool
+        dest: /usr/local/bin/amtool
+        mode: '0755'
+
+    - name: Create Prometheus group
+      group:
+        name: prometheus
+        state: present
+
+    - name: Create Prometheus user
+      become: true
+      user:
+        name: prometheus
+        group: prometheus
+        shell: /sbin/nologin
+        system: yes
+
+    - name: Create Prometheus directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: prometheus
+        group: prometheus
+        mode: '0755'
+      loop:
+        - /etc/prometheus
+        - /var/lib/prometheus
+        - /var/log/prometheus
+
+    - name: Copy Prometheus configuration file
+      copy:
+        src: prometheus.yaml
+        dest: /etc/prometheus/prometheus.yaml
+        owner: prometheus
+        group: prometheus
+        mode: '0644'
+
+    - name: Create Prometheus systemd service
+      copy:
+        dest: /etc/systemd/system/prometheus.service
+        content: |
+          [Unit]
+          Description=Prometheus
+          After=network.target
+
+          [Service]
+          User=prometheus
+          Group=prometheus
+          ExecStart=/usr/local/bin/prometheus --config.file=/etc/prometheus/prometheus.yaml --storage.tsdb.path=/var/lib/prometheus
+          Restart=on-failure
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Enable and start Prometheus service
+      systemd:
+        name: prometheus
+        enabled: yes
+        state: started
+
+  handlers:
+    - name: daemon reload
+      systemd:
+        daemon_reload: yes
+
+    - name: restart prometheus
+      systemd:
+        name: prometheus
+        state: restarted
+        enabled: yes
+
+
+
