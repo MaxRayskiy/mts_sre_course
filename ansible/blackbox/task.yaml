@@ -1,0 +1,70 @@
+---
+- name: Setup blackbox_exporter
+  hosts: balancers
+  become: true
+
+  tasks:
+    - name: Create Prometheus group
+      group:
+        name: prometheus
+        state: present
+
+    - name: Create Prometheus user
+      become: true
+      user:
+        name: prometheus
+        group: prometheus
+        shell: /sbin/nologin
+        system: yes
+
+    - name: Create Prometheus directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: prometheus
+        group: prometheus
+        mode: '0755'
+      loop:
+        - /etc/prometheus
+        - /var/lib/prometheus
+        - /var/log/prometheus
+
+    - name: Copy blackbox_exporter binary
+      copy:
+        src: ../bin/blackbox_exporter
+        dest: /usr/local/bin/blackbox_exporter
+        mode: '0755'
+
+    - name: Copy blackbox configuration file
+      copy:
+        src: blackbox.yaml
+        dest: /etc/prometheus/blackbox.yaml
+        owner: prometheus
+        group: prometheus
+        mode: '0644'
+
+    - name: Setup systemd
+      copy:
+        dest: /etc/systemd/system/blackbox_exporter.service
+        content: |
+          [Unit]
+          Description=Blackbox Exporter
+          After=network.target
+
+          [Service]
+          User=prometheus
+          Group=prometheus
+          ExecStart=/usr/local/bin/blackbox_exporter --config.file=/etc/prometheus/blackbox.yaml
+          Restart=on-failure
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Reload systemd
+      command: systemctl daemon-reload
+
+    - name: Enable and start blackbox_exporter service
+      systemd:
+        name: blackbox_exporter
+        enabled: yes
+        state: started

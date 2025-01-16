@@ -1,10 +1,10 @@
 ---
-- name: Setup Prometheus
+- name: Setup postgres_exporter
   hosts: master:replica
   become: true
 
   tasks:
-    - name: Copy Prometheus binary
+    - name: Copy postgres_exporter binary
       copy:
         src: ../bin/postgres_exporter
         dest: /usr/local/bin/postgres_exporter
@@ -23,7 +23,7 @@
           Group=root
           Environment=DATA_SOURCE_URI=localhost:5432/postgres?sslmode=disable
           Environment=DATA_SOURCE_USER=postgres
-          Environment=DATA_SOURCE_PASS=secretpassword
+          Environment=DATA_SOURCE_PASS=pass
           ExecStart=/usr/local/bin/postgres_exporter --web.listen-address=:9187 --web.telemetry-path=/metrics
           Restart=on-failure
     
