@@ -1,0 +1,17 @@
+[etcd_cluster]
+192.168.1.50 ansible_ssh_host=176.109.82.213 ansible_ssh_port=28025
+192.168.1.51 ansible_ssh_host=176.109.82.213 ansible_ssh_port=28026
+192.168.1.52 ansible_ssh_host=176.109.82.213 ansible_ssh_port=28027
+
+[balancers]
+192.168.1.47 ansible_ssh_host=176.109.82.213 ansible_ssh_port=28022
+
+[master]
+192.168.1.48 ansible_ssh_host=176.109.82.213 ansible_ssh_port=28023
+
+[replica]
+192.168.1.49 ansible_ssh_host=176.109.82.213 ansible_ssh_port=28024
+
+[all:vars]
+ansible_user='maraiskii'
+ansible_ssh_private_key_file=/Users/maxraiskii/.ssh/sre_mts
