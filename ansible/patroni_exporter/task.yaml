@@ -1,0 +1,34 @@
+---
+- name: Setup patroni_exporter
+  hosts: master:replica
+  become: true
+
+  tasks:
+    - name: Copy patroni_exporter binary
+      copy:
+        src: ../bin/patroni_exporter
+        dest: /usr/local/bin/patroni_exporter
+        mode: '0755'
+
+    - name: Create postgres_exporter
+      copy:
+        dest: /etc/systemd/system/patroni_exporter.service
+        content: |
+          [Unit]
+          Description=Patroni Exporter
+          After=network.target
+    
+          [Service]
+          User=root
+          Group=root
+          ExecStart=/usr/local/bin/patroni_exporter -l http://localhost:8008
+          Restart=on-failure
+    
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Start patroni_exporter
+      systemd:
+        name: patroni_exporter
+        enabled: yes
+        state: started

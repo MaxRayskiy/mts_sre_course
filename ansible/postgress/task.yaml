@@ -1,0 +1,37 @@
+---
+- name: Setup postgres_exporter
+  hosts: master:replica
+  become: true
+
+  tasks:
+    - name: Copy postgres_exporter binary
+      copy:
+        src: ../bin/postgres_exporter
+        dest: /usr/local/bin/postgres_exporter
+        mode: '0755'
+
+    - name: Create postgres_exporter
+      copy:
+        dest: /etc/systemd/system/postgres_exporter.service
+        content: |
+          [Unit]
+          Description=Prometheus Postgres Exporter
+          After=network.target
+    
+          [Service]
+          User=root
+          Group=root
+          Environment=DATA_SOURCE_URI=localhost:5432/postgres?sslmode=disable
+          Environment=DATA_SOURCE_USER=postgres
+          Environment=DATA_SOURCE_PASS=pass
+          ExecStart=/usr/local/bin/postgres_exporter --web.listen-address=:9187 --web.telemetry-path=/metrics
+          Restart=on-failure
+    
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Start postgres_exporter
+      systemd:
+        name: postgres_exporter
+        enabled: yes
+        state: started
