@@ -117,6 +117,6 @@ tolerations: []
 affinity: {}
 
 env:
-  CONNECTIONSTRINGS__PGCONNECTION: Server=192.168.1.48;Port=5432;User id=postgres;Database=postgres;password=pass;
+  CONNECTIONSTRINGS__PGCONNECTION: Server=192.168.1.47;Port=5432;User id=postgres;Database=postgres;password=pass;
   ASPNETCORE_ENVIRONMENT: "1"
   ASPNETCORE_URLS: http://*:80
