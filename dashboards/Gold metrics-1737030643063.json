@@ -24,7 +24,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cea46a31d1r0ga"
+        "uid": "eeaytldggpt6of"
       },
       "fieldConfig": {
         "defaults": {
@@ -103,10 +103,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cea46a31d1r0ga"
+            "uid": "eeaytldggpt6of"
           },
           "editorMode": "code",
-          "expr": "probe_http_duration_seconds\n",
+          "expr": "sum(nginx_ingress_controller_nginx_process_connections{state=\"active\"})\n",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -119,7 +119,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cea46a31d1r0ga"
+        "uid": "eeaytldggpt6of"
       },
       "fieldConfig": {
         "defaults": {
@@ -198,10 +198,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cea46a31d1r0ga"
+            "uid": "eeaytldggpt6of"
           },
           "editorMode": "code",
-          "expr": "probe_http_duration_seconds",
+          "expr": "histogram_quantile(0.95, sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{host=\"raiskii\"}[1m])) by (le))\n",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -214,7 +214,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cea46a31d1r0ga"
+        "uid": "eeaytldggpt6of"
       },
       "fieldConfig": {
         "defaults": {
@@ -293,10 +293,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cea46a31d1r0ga"
+            "uid": "eeaytldggpt6of"
           },
           "editorMode": "code",
-          "expr": "(1 - avg(probe_success)) * 100\n",
+          "expr": "sum(rate(nginx_ingress_controller_requests{status=~\"5..\"}[1m]))\n\n",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -309,7 +309,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cea46a31d1r0ga"
+        "uid": "eeaytldggpt6of"
       },
       "fieldConfig": {
         "defaults": {
@@ -349,6 +349,7 @@
             }
           },
           "mappings": [],
+          "max": 1,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -388,11 +389,11 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cea46a31d1r0ga"
+            "uid": "eeaytldggpt6of"
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "sum(rate(probe_success[5m]))",
+          "expr": "sum(rate(nginx_ingress_controller_requests{ingress=\"sre-cource-api\"}[15s]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -412,13 +413,13 @@
     "list": []
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-12h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Gold metrics",
+  "title": "Golden metrics",
   "uid": "dea5xp05q2qdca",
-  "version": 1,
+  "version": 3,
   "weekStart": ""
 }
